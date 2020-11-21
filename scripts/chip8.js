@@ -6,19 +6,31 @@ import CPU from './cpu.js';
 const renderer = new Renderer(10);
 const keyboard = new Keyboard();
 const speaker = new Speaker();
-const cpu = new CPU(renderer, keyboard, speaker);
+let cpu;
 
 let loop;
 
 let fps = 60, fpsInterval, startTime, now, then, elapsed;
 
-function init() {
+window.loadEmulator = (e) => {
+    let rom = e.files[0];
+
+    rom.stream().getReader().read().then(data => {
+        init(data.value);
+    });
+}
+
+function init (rom) {
 	fpsInterval = 1000 / fps;
 	then = Date.now();
 	startTime = then;
 
+    renderer.clear();
+
+    cpu = new CPU(renderer, keyboard, speaker);
+
 	cpu.loadSpritesIntoMemory();
-	cpu.loadRom('BLINKY');
+	cpu.loadProgramIntoMemory(rom);
 	loop = requestAnimationFrame(step);
 }
 
@@ -33,4 +45,4 @@ function step() {
 	loop = requestAnimationFrame(step);
 }
 
-init();
+//init();
